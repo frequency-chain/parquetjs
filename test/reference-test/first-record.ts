@@ -140,6 +140,91 @@ export function getFirstRecord(filename: string): [true, any] | [false, null] {
       return [true, { a: 50462976, b: 1734763876 }];
     case 'datapage_v1-uncompressed-checksum.parquet':
       return [true, { a: 50462976, b: 1734763876 }];
+    case 'datapage_v2.snappy.parquet':
+      return [
+        true,
+        {
+          a: 'abc',
+          b: 1,
+          c: 2,
+          d: false,
+          e: {
+            list: [{ element: 1 }, { element: 2 }, { element: 3 }],
+          },
+        },
+      ];
+    case 'delta_binary_packed.parquet':
+      return [
+        true,
+        {
+          bitwidth0: 6374628540732951412n,
+          bitwidth1: 0n,
+          bitwidth2: 0n,
+          bitwidth3: 0n,
+          bitwidth4: 0n,
+          bitwidth5: 0n,
+          bitwidth6: 0n,
+          bitwidth7: 0n,
+          bitwidth8: 0n,
+          bitwidth9: 0n,
+          bitwidth10: 0n,
+          bitwidth11: 0n,
+          bitwidth12: 0n,
+          bitwidth13: 0n,
+          bitwidth14: 0n,
+          bitwidth15: 0n,
+          bitwidth16: 0n,
+          bitwidth17: 0n,
+          bitwidth18: 0n,
+          bitwidth19: 0n,
+          bitwidth20: 0n,
+          bitwidth21: 0n,
+          bitwidth22: 0n,
+          bitwidth23: 0n,
+          bitwidth24: 0n,
+          bitwidth25: 0n,
+          bitwidth26: 0n,
+          bitwidth27: 0n,
+          bitwidth28: 0n,
+          bitwidth29: 0n,
+          bitwidth30: 0n,
+          bitwidth31: 0n,
+          bitwidth32: 0n,
+          bitwidth33: 0n,
+          bitwidth34: 0n,
+          bitwidth35: 0n,
+          bitwidth36: 0n,
+          bitwidth37: 0n,
+          bitwidth38: 0n,
+          bitwidth39: 0n,
+          bitwidth40: 0n,
+          bitwidth41: 0n,
+          bitwidth42: 0n,
+          bitwidth43: 0n,
+          bitwidth44: 0n,
+          bitwidth45: 0n,
+          bitwidth46: 0n,
+          bitwidth47: 0n,
+          bitwidth48: 0n,
+          bitwidth49: 0n,
+          bitwidth50: 0n,
+          bitwidth51: 0n,
+          bitwidth52: 0n,
+          bitwidth53: 0n,
+          bitwidth54: 0n,
+          bitwidth55: 0n,
+          bitwidth56: 0n,
+          bitwidth57: 0n,
+          bitwidth58: 0n,
+          bitwidth59: 0n,
+          bitwidth60: 0n,
+          bitwidth61: 0n,
+          bitwidth62: 0n,
+          bitwidth63: 0n,
+          bitwidth64: 0n,
+          int_value: -2070986743,
+        },
+      ];
     case 'dict-page-offset-zero.parquet':
       return [
         true,
@@ -615,8 +700,6 @@ export function getFirstRecord(filename: string): [true, any] | [false, null] {
       ];
     // Not supported - see read-all-test.ts
     // case ("byte_stream_split.zstd.parquet"):
-    // case ("datapage_v2.snappy.parquet"):
-    // case ("delta_binary_packed.parquet"):
     // case ("delta_byte_array.parquet"):
     // case ("delta_encoding_optional_column.parquet"):
     // case ("delta_encoding_required_column.parquet"):
