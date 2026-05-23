@@ -16,6 +16,10 @@ function assertIntegerType(type: string) {
 }
 
 function normalizeIntegerValue(type: string, value: IntegerValue) {
+  if (typeof value === 'number' && (!Number.isFinite(value) || !Number.isInteger(value))) {
+    throw new Error(`${type} value must be a finite integer`);
+  }
+
   const normalized = typeof value === 'bigint' ? value : BigInt(value);
 
   if (type === 'INT32' && (normalized < INT32_MIN || normalized > INT32_MAX)) {
@@ -115,7 +119,13 @@ function toSafeCount(value: bigint, name: string) {
 }
 
 function validateBlockLayout(blockSize: number, miniBlockCount: number) {
-  if (blockSize <= 0 || miniBlockCount <= 0 || blockSize % miniBlockCount !== 0) {
+  if (
+    !Number.isInteger(blockSize) ||
+    !Number.isInteger(miniBlockCount) ||
+    blockSize <= 0 ||
+    miniBlockCount <= 0 ||
+    blockSize % miniBlockCount !== 0
+  ) {
     throw new Error('invalid DELTA_BINARY_PACKED block layout');
   }
 }
@@ -144,17 +154,35 @@ function maxBitWidth(values: bigint[]) {
   return width;
 }
 
+function bitMask(bitWidth: number) {
+  return (1n << BigInt(bitWidth)) - 1n;
+}
+
 function packMiniBlock(values: bigint[], bitWidth: number) {
   const buf = Buffer.alloc(Math.ceil((values.length * bitWidth) / 8));
 
-  for (let valueIndex = 0; valueIndex < values.length; valueIndex++) {
-    const value = values[valueIndex];
-    for (let bitIndex = 0; bitIndex < bitWidth; bitIndex++) {
-      if (((value >> BigInt(bitWidth - bitIndex - 1)) & 1n) === 1n) {
-        const packedBitIndex = valueIndex * bitWidth + bitIndex;
-        buf[Math.floor(packedBitIndex / 8)] |= 1 << (7 - (packedBitIndex % 8));
-      }
+  if (bitWidth === 0) {
+    return buf;
+  }
+
+  let accumulator = 0n;
+  let bitsInAccumulator = 0;
+  let byteOffset = 0;
+
+  for (const value of values) {
+    accumulator = (accumulator << BigInt(bitWidth)) | value;
+    bitsInAccumulator += bitWidth;
+
+    while (bitsInAccumulator >= 8) {
+      bitsInAccumulator -= 8;
+      buf[byteOffset] = Number((accumulator >> BigInt(bitsInAccumulator)) & 0xffn);
+      byteOffset += 1;
+      accumulator &= bitMask(bitsInAccumulator);
     }
+  }
+
+  if (bitsInAccumulator > 0) {
+    buf[byteOffset] = Number((accumulator << BigInt(8 - bitsInAccumulator)) & 0xffn);
   }
 
   return buf;
@@ -166,18 +194,26 @@ function unpackMiniBlock(cursor: Cursor, count: number, bitWidth: number) {
     throw new Error('invalid DELTA_BINARY_PACKED encoding');
   }
 
+  if (bitWidth === 0) {
+    return new Array(count).fill(0n);
+  }
+
   const values = [];
+  let accumulator = 0n;
+  let bitsInAccumulator = 0;
+  let byteOffset = cursor.offset;
+
   for (let valueIndex = 0; valueIndex < count; valueIndex++) {
-    let value = 0n;
-    for (let bitIndex = 0; bitIndex < bitWidth; bitIndex++) {
-      const packedBitIndex = valueIndex * bitWidth + bitIndex;
-      const byte = cursor.buffer[cursor.offset + Math.floor(packedBitIndex / 8)];
-      if ((byte & (1 << (7 - (packedBitIndex % 8)))) !== 0) {
-        value |= 1n << BigInt(bitWidth - bitIndex - 1);
-      }
+    while (bitsInAccumulator < bitWidth) {
+      accumulator = (accumulator << 8n) | BigInt(cursor.buffer[byteOffset]);
+      bitsInAccumulator += 8;
+      byteOffset += 1;
     }
 
+    bitsInAccumulator -= bitWidth;
+    const value = (accumulator >> BigInt(bitsInAccumulator)) & bitMask(bitWidth);
     values.push(value);
+    accumulator &= bitMask(bitsInAccumulator);
   }
 
   cursor.offset += byteLength;
@@ -185,15 +221,8 @@ function unpackMiniBlock(cursor: Cursor, count: number, bitWidth: number) {
 }
 
 function getBlockLayout(opts?: Options) {
-  const customOpts = opts as Options & {
-    blockSize?: number;
-    miniBlockCount?: number;
-    deltaBinaryPackedBlockSize?: number;
-    deltaBinaryPackedMiniBlockCount?: number;
-  };
-  const blockSize = customOpts?.deltaBinaryPackedBlockSize || customOpts?.blockSize || DEFAULT_BLOCK_SIZE;
-  const miniBlockCount =
-    customOpts?.deltaBinaryPackedMiniBlockCount || customOpts?.miniBlockCount || DEFAULT_MINI_BLOCK_COUNT;
+  const blockSize = opts?.deltaBinaryPackedBlockSize ?? opts?.blockSize ?? DEFAULT_BLOCK_SIZE;
+  const miniBlockCount = opts?.deltaBinaryPackedMiniBlockCount ?? opts?.miniBlockCount ?? DEFAULT_MINI_BLOCK_COUNT;
 
   validateBlockLayout(blockSize, miniBlockCount);
   return { blockSize, miniBlockCount };
@@ -251,7 +280,7 @@ export const encodeValues = function (type: string, values: IntegerValue[], opts
   return Buffer.concat(buffers);
 };
 
-export const decodeValues = function (type: string, cursor: Cursor, count: number) {
+export const decodeValues = function (type: string, cursor: Cursor, count: number, _opts?: Options) {
   assertIntegerType(type);
 
   const blockSize = toSafeCount(readUnsignedVarint(cursor), 'block size');
@@ -261,7 +290,7 @@ export const decodeValues = function (type: string, cursor: Cursor, count: numbe
   validateBlockLayout(blockSize, miniBlockCount);
 
   if (totalValueCount !== count) {
-    throw new Error('DELTA_BINARY_PACKED value count does not match page count');
+    throw new Error(`DELTA_BINARY_PACKED value count ${totalValueCount} does not match requested count ${count}`);
   }
 
   if (totalValueCount === 0) {

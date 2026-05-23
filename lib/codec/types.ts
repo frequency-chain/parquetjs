@@ -18,6 +18,10 @@ export interface Options {
   num_values?: number;
   rLevelMax?: number;
   dLevelMax?: number;
+  blockSize?: number;
+  miniBlockCount?: number;
+  deltaBinaryPackedBlockSize?: number;
+  deltaBinaryPackedMiniBlockCount?: number;
   type?: string;
   name?: string;
   precision?: number;
