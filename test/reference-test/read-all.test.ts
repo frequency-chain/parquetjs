@@ -21,12 +21,10 @@ export const unsupported = [
   'nested_structs.rust.parquet', // ZSTD unsupported
   'non_hadoop_lz4_compressed.parquet', // ZSTD unsupported
   'rle_boolean_encoding.parquet', // BUG?: https://github.com/LibertyDSNP/parquetjs/issues/113
-  'datapage_v2.snappy.parquet', // DELTA_BINARY_PACKED unsupported
-  'delta_binary_packed.parquet', // DELTA_BINARY_PACKED unsupported
   'delta_byte_array.parquet', // DELTA_BYTE_ARRAY unsupported
-  'delta_encoding_optional_column.parquet', // DELTA_BINARY_PACKED unsupported
-  'delta_encoding_required_column.parquet', // DELTA_BINARY_PACKED unsupported
-  'delta_length_byte_array.parquet', // ZSTD unsupported, DELTA_BINARY_PACKED unsupported
+  'delta_encoding_optional_column.parquet', // DELTA_BYTE_ARRAY unsupported
+  'delta_encoding_required_column.parquet', // DELTA_BYTE_ARRAY unsupported
+  'delta_length_byte_array.parquet', // ZSTD unsupported, DELTA_LENGTH_BYTE_ARRAY unsupported
   'large_string_map.brotli.parquet', // Fails as the large string is > 1 GB
 ];
 
