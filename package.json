@@ -48,6 +48,7 @@
     "eslint": "10.8.0",
     "eslint-plugin-mocha": "11.2.0",
     "events": "3.3.0",
+    "globals": "^17.7.0",
     "mocha": "12.0.0-rc.2",
     "msw": "2.14.6",
     "object-stream": "0.0.1",
