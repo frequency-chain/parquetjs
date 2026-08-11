@@ -629,6 +629,13 @@ export function getFirstRecord(filename: string): [true, any] | [false, null] {
           f64: -1.3065268517353166,
         },
       ];
+    case 'bson.parquet':
+      return [
+        true,
+         {"a":1}
+      ];
+    case 'json.parquet':
+      return [ true, { json_field: { a: 1 }}];
     // Not supported - see read-all-test.ts
     // case ("datapage_v2.snappy.parquet"):
     // case ("delta_binary_packed.parquet"):
