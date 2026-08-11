@@ -4,8 +4,9 @@
  * See the example server for how to use it.
  */
 import { compressionBrowserPlugin } from './esbuild-plugins.mjs';
-import watPlugin from 'esbuild-plugin-wat';
 import esbuild from 'esbuild';
+import { wasmLoader } from 'esbuild-plugin-wasm';
+
 // esbuild has TypeScript support by default. It will use .tsconfig
 esbuild
   .context({
@@ -13,7 +14,7 @@ esbuild
     outfile: 'main.js',
     define: { 'process.env.NODE_DEBUG': 'false', 'process.env.NODE_ENV': '"production"', global: 'window' },
     platform: 'browser',
-    plugins: [compressionBrowserPlugin, watPlugin()],
+    plugins: [compressionBrowserPlugin, wasmLoader()],
     sourcemap: 'external',
     bundle: true,
     minify: false,
