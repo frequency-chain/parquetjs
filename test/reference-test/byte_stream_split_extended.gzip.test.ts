@@ -26,7 +26,6 @@ describe('byte_stream_split_extended.gzip.parquet', function() {
     ];
 
     for (const pair of column_pairs) {
-      console.log(`comparing ${pair[0]}  to ${pair[1]}`);
       expect(record[pair[0]]).to.deep.equal(record[pair[1]]);
     }
   });
