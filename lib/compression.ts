@@ -28,6 +28,10 @@ export const PARQUET_COMPRESSION_METHODS: PARQUET_COMPRESSION_METHODS = {
     deflate: deflate_brotli,
     inflate: inflate_brotli,
   },
+  ZSTD: {
+    deflate: deflate_zstd,
+    inflate: inflate_zstd,
+  }
 };
 
 /**
@@ -57,6 +61,9 @@ function deflate_snappy(value: ArrayBuffer | Buffer | Uint8Array) {
 async function deflate_brotli(value: Uint8Array) {
   return zlib.brotliCompressSync(value);
 }
+async function deflate_zstd(value: Uint8Array) {
+  return zlib.zstdCompressSync(value);
+}
 
 /**
  * Inflate a value using compression method `method`
@@ -84,6 +91,10 @@ function inflate_snappy(value: ArrayBuffer | Buffer | Uint8Array) {
 
 async function inflate_brotli(value: Uint8Array) {
   return zlib.brotliDecompressSync(value);
+}
+
+async function inflate_zstd(value: Uint8Array) {
+  return zlib.zstdDecompressSync(value);
 }
 
 function buffer_from_result(result: ArrayBuffer | Buffer | Uint8Array): Buffer {
