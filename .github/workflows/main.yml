@@ -20,6 +20,12 @@ jobs:
       - name: Install 💾
         run: npm ci
 
+      - name: Build Node Version
+        run: npm build
+
+      - name: Build Browser Version
+        run: npm build:browser
+
       - name: Lint
         run: npm run lint
 

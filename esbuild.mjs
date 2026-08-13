@@ -1,5 +1,5 @@
 import esbuild from 'esbuild';
-import watPlugin from 'esbuild-plugin-wat';
+import { wasmLoader } from 'esbuild-plugin-wasm';
 import { compressionBrowserPlugin } from './esbuild-plugins.mjs';
 // esbuild has TypeScript support by default
 const baseConfig = {
@@ -14,7 +14,7 @@ const baseConfig = {
   minify: true,
   mainFields: ['browser', 'module', 'main'],
   platform: 'browser', // default
-  plugins: [compressionBrowserPlugin, watPlugin()],
+  plugins: [compressionBrowserPlugin, wasmLoader()],
   target: 'es2020', // default
 };
 // configuration for generating test code in browser
@@ -30,7 +30,7 @@ const testConfig = {
   minify: false,
   mainFields: ['browser', 'module', 'main'],
   platform: 'browser', // default
-  plugins: [compressionBrowserPlugin, watPlugin()],
+  plugins: [compressionBrowserPlugin, wasmLoader()],
   target: 'es2020', // default
 };
 const targets = [
