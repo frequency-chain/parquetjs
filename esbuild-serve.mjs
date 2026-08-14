@@ -5,7 +5,6 @@
  */
 import { compressionBrowserPlugin } from './esbuild-plugins.mjs';
 import esbuild from 'esbuild';
-import { wasmLoader } from 'esbuild-plugin-wasm';
 
 // esbuild has TypeScript support by default. It will use .tsconfig
 esbuild
@@ -14,7 +13,10 @@ esbuild
     outfile: 'main.js',
     define: { 'process.env.NODE_DEBUG': 'false', 'process.env.NODE_ENV': '"production"', global: 'window' },
     platform: 'browser',
-    plugins: [compressionBrowserPlugin, wasmLoader()],
+    loader: {
+      '.wasm': 'file',
+    },
+    plugins: [compressionBrowserPlugin],
     sourcemap: 'external',
     bundle: true,
     minify: false,

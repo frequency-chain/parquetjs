@@ -10,3 +10,4 @@ examples/server/package-lock.json
 test/browser/*.js
 main.js
 main.js.map
+brotli_wasm*
