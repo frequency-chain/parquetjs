@@ -44,7 +44,6 @@
     "chai": "5.3.3",
     "core-js": "3.49.0",
     "esbuild": "^0.28.1",
-    "esbuild-plugin-wasm": "^1.1.0",
     "eslint": "10.8.0",
     "eslint-plugin-mocha": "11.2.0",
     "events": "3.3.0",

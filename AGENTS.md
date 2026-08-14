@@ -1,8 +1,7 @@
 # Overview
 1. Read README.md and package.json to understand the purpose of this package and its tech stack.
 2. Read .tool-versions for the node version.
-3. Read other dotfiles to understand configurations
-4. Test data files are *.parquet files throughout the repository.
+3. Test data files are *.parquet files throughout the repository.
 
 # Rules
 1. New packages must be pinned to exact versions.
