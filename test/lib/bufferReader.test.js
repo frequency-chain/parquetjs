@@ -1,7 +1,7 @@
 import { use, expect } from 'chai';
 import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
-import sinonChaiInOrder from 'sinon-chai-in-order';
+import sinonChaiInOrder from '../util/sinon-chai-in-order';
 import BufferReader from '../../lib/bufferReader';
 import { ParquetEnvelopeReader } from '../../lib/reader';
 

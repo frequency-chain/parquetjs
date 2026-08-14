@@ -383,7 +383,7 @@ async function readTestFile() {
     assert.equal(await cursor.next(), null);
   }
 
-  reader.close();
+  await reader.close();
 }
 
 describe('Parquet', function () {
@@ -457,42 +457,21 @@ describe('Parquet', function () {
       return verifyStatistics();
     });
 
-    it('write a test file with GZIP compression', function () {
-      const opts = { useDataPageV2: true, compression: 'GZIP' };
-      return writeTestFile(opts);
-    });
+    for (let compression of [
+      'GZIP',
+      'SNAPPY',
+      'BROTLI',
+      'ZSTD',
+      // 'LZO',
+      // 'LZ4',
+    ]) {
+      it(`write a test file with ${compression} compression and then read it back`, function() {
+          const opts = { useDataPageV2: true, compression };
+          return writeTestFile(opts).then(readTestFile);
+      });
+    }
 
-    it('write a test file with GZIP compression and then read it back', function () {
-      const opts = { useDataPageV2: true, compression: 'GZIP' };
-      return writeTestFile(opts).then(readTestFile);
-    });
-
-    it('write a test file with SNAPPY compression', function () {
-      const opts = { useDataPageV2: true, compression: 'SNAPPY' };
-      return writeTestFile(opts);
-    });
-
-    it('write a test file with SNAPPY compression and then read it back', function () {
-      const opts = { useDataPageV2: true, compression: 'SNAPPY' };
-      return writeTestFile(opts).then(readTestFile);
-    });
-
-    it('write a test file with SNAPPY compression and then read it back V2 false', function () {
-      const opts = { useDataPageV2: false, compression: 'SNAPPY' };
-      return writeTestFile(opts).then(readTestFile);
-    });
-
-    it('write a test file with BROTLI compression', async function () {
-      const opts = { useDataPageV2: true, compression: 'BROTLI' };
-      return await writeTestFile(opts);
-    });
-
-    it('write a test file with BROTLI compression and then read it back', async function () {
-      const opts = { useDataPageV2: true, compression: 'BROTLI' };
-      return await writeTestFile(opts).then(readTestFile);
-    });
-
-    it('write a Uint8Array field and then read it back', async function () {
+    it('write a Uint8Array field with UNCOMPRESSED and then read it back', async function () {
       const opts = { useDataPageV2: true, compression: 'UNCOMPRESSED' };
       const schema = new parquet.ParquetSchema({
         data: { type: 'BYTE_ARRAY', compression: opts.compression },

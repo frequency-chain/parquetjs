@@ -6,6 +6,7 @@
 'use strict';
 import snappy from 'snappyjs';
 import * as brotli from './brotli.js';
+import { inflate as pako_zstd_inflate, deflate as pako_zstd_deflate } from 'pako';
 
 type PARQUET_COMPRESSION_METHODS = Record<
   string,
@@ -32,6 +33,10 @@ export const PARQUET_COMPRESSION_METHODS: PARQUET_COMPRESSION_METHODS = {
     deflate: deflate_brotli,
     inflate: inflate_brotli,
   },
+  ZSTD: {
+    deflate: deflate_zstd,
+    inflate: inflate_zstd,
+  }
 };
 
 /**
@@ -64,6 +69,10 @@ async function deflate_brotli(value: Uint8Array) {
   return buffer_from_result(await brotli.compress(value));
 }
 
+async function deflate_zstd(value: Uint8Array) {
+  return buffer_from_result(pako_zstd_deflate(value));
+}
+
 /**
  * Inflate a value using compression method `method`
  */
@@ -92,6 +101,10 @@ function inflate_snappy(value: ArrayBuffer | Buffer | Uint8Array) {
 
 async function inflate_brotli(value: Uint8Array) {
   return buffer_from_result(await brotli.inflate(value));
+}
+
+async function inflate_zstd(value: Uint8Array) {
+  return buffer_from_result(pako_zstd_inflate(value));
 }
 
 function buffer_from_result(result: ArrayBuffer | Buffer | Uint8Array): Buffer {

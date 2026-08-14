@@ -15,8 +15,11 @@ import SplitBlockBloomFilter from './bloom/sbbf';
 import { createSBBFParams } from './bloomFilterIO/bloomFilterWriter';
 import Int64 from 'node-int64';
 
-export type ParquetCodec = 'PLAIN' | 'RLE';
-export type ParquetCompression = 'UNCOMPRESSED' | 'GZIP' | 'SNAPPY' | 'LZO' | 'BROTLI' | 'LZ4';
+export type ParquetCodec = 'PLAIN' | 'RLE' | 'PLAIN_DICTIONARY' | 'RLE_DICTIONARY' | 'BYTE_STREAM_SPLIT';
+
+// Currently LZO and LZ4 are not supported
+export type ParquetCompression = 'UNCOMPRESSED' | 'GZIP' | 'SNAPPY' | 'LZO' | 'BROTLI' | 'LZ4' | 'ZSTD';
+
 export type RepetitionType = 'REQUIRED' | 'OPTIONAL' | 'REPEATED';
 export type ParquetType = PrimitiveType | OriginalType;
 
