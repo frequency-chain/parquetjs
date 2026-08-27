@@ -2,7 +2,7 @@
 name: Release Package
 on:
   release:
-    types: [released, prereleased]
+    types: [released]
 jobs:
   publish-to-npm:
     runs-on: ubuntu-latest
