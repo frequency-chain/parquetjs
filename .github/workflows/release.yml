@@ -25,4 +25,4 @@ jobs:
         run: npm version ${{ github.event.release.tag_name }} --no-git-tag-version
 
       - name: Publish 🚂
-        run: npm publish --tag latest --provenance
+        run: npm publish --tag latest
