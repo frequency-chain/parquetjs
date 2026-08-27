@@ -1,7 +1,11 @@
 // NOTICE: This is the NodeJS implementation.
 // The browser implementation is ./browser/compression.ts
 import zlib from 'zlib';
+import { promisify } from 'util';
 import snappy from 'snappyjs';
+
+const gzipAsync = promisify(zlib.gzip);
+const gunzipAsync = promisify(zlib.gunzip);
 
 type PARQUET_COMPRESSION_METHODS = Record<
   string,
@@ -31,7 +35,7 @@ export const PARQUET_COMPRESSION_METHODS: PARQUET_COMPRESSION_METHODS = {
   ZSTD: {
     deflate: deflate_zstd,
     inflate: inflate_zstd,
-  }
+  },
 };
 
 /**
@@ -50,7 +54,7 @@ function deflate_identity(value: ArrayBuffer | Buffer | Uint8Array) {
 }
 
 function deflate_gzip(value: ArrayBuffer | Buffer | string) {
-  return zlib.gzipSync(value);
+  return gzipAsync(value);
 }
 
 function deflate_snappy(value: ArrayBuffer | Buffer | Uint8Array) {
@@ -81,7 +85,7 @@ async function inflate_identity(value: ArrayBuffer | Buffer | Uint8Array): Promi
 }
 
 async function inflate_gzip(value: Buffer | ArrayBuffer | string) {
-  return zlib.gunzipSync(value);
+  return gunzipAsync(value);
 }
 
 function inflate_snappy(value: ArrayBuffer | Buffer | Uint8Array) {
