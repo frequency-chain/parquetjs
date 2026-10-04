@@ -24,6 +24,9 @@ jobs:
         env:
           FULL_SHA: ${{ github.sha }}
 
+      - name: Build 📦
+        run: npm run prepublishOnly
+
       - name: Publish @next 🚂
         run: npm publish --tag next --access public
         env:
