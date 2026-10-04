@@ -24,5 +24,8 @@ jobs:
       - name: Version ⬆️
         run: npm version ${{ github.event.release.tag_name }} --no-git-tag-version
 
+      - name: Build 📦
+        run: npm run prepublishOnly
+
       - name: Publish 🚂
         run: npm publish --tag latest
