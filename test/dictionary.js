@@ -6,7 +6,7 @@ const path = require('path');
 const fs = require('fs');
 
 describe('dictionary encoding', function () {
-  for (const physicalType of ['int32', 'int64']) {
+  for (const physicalType of ['int32', 'int64', 'int64-low-precision']) {
     it(`should read dictionary-encoded ${physicalType} decimals`, async function () {
       const reader = await parquet.ParquetReader.openBuffer(
         fs.readFileSync(path.resolve(__dirname, `test-files/decimal-${physicalType}-dictionary.parquet`))
