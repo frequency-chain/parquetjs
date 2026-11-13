@@ -46,7 +46,7 @@ function decodeValues_INT32(cursor: Cursor, count: number, opts: Options) {
   const name = opts.name || opts.column?.name || undefined;
   try {
     if (opts.originalType === 'DECIMAL') {
-      values = decodeValues_DECIMAL(cursor, count, opts);
+      values = decodeValues_DECIMAL(cursor, count, opts, 4);
     } else {
       for (let i = 0; i < count; ++i) {
         values.push(cursor.buffer.readInt32LE(cursor.offset));
@@ -82,7 +82,7 @@ function decodeValues_INT64(cursor: Cursor, count: number, opts: Options) {
   try {
     if (opts.originalType === 'DECIMAL' || opts.column?.originalType === 'DECIMAL') {
       const columnOptions: any = opts.column?.originalType ? opts.column : opts;
-      values = decodeValues_DECIMAL(cursor, count, columnOptions);
+      values = decodeValues_DECIMAL(cursor, count, columnOptions, 8);
     } else {
       for (let i = 0; i < count; ++i) {
         values.push(cursor.buffer.readBigInt64LE(cursor.offset));
@@ -97,7 +97,7 @@ function decodeValues_INT64(cursor: Cursor, count: number, opts: Options) {
   return values;
 }
 
-function decodeValues_DECIMAL(cursor: Cursor, count: number, opts: Options) {
+function decodeValues_DECIMAL(cursor: Cursor, count: number, opts: Options, byteWidth: 4 | 8) {
   const precision = opts.precision;
   // Default scale to 0 per spec
   const scale = opts.scale || 0;
@@ -109,21 +109,15 @@ function decodeValues_DECIMAL(cursor: Cursor, count: number, opts: Options) {
 
   const values = [];
 
-  // by default we prepare the offset and bufferFunction to work with 32bit integers
-  let offset = 4;
-  let bufferFunction: any = (offset: number) => cursor.buffer.readInt32LE(offset);
-  if (precision > 9) {
-    // if the precision is over 9 digits, then we are dealing with a 64bit integer
-    offset = 8;
-    bufferFunction = (offset: number) => cursor.buffer.readBigInt64LE(offset);
-  }
+  const bufferFunction = (offset: number) =>
+    byteWidth === 8 ? cursor.buffer.readBigInt64LE(offset) : cursor.buffer.readInt32LE(offset);
   for (let i = 0; i < count; ++i) {
     const bufferSize = cursor.size || 0;
     if (bufferSize === 0 || cursor.offset < bufferSize) {
       const fullValue = bufferFunction(cursor.offset);
       const valueWithDecimalApplied = Number(fullValue) / Math.pow(10, scale);
       values.push(valueWithDecimalApplied);
-      cursor.offset += offset;
+      cursor.offset += byteWidth;
     }
   }
 

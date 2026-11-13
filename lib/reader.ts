@@ -834,7 +834,9 @@ function decodeStatisticsValue(value: any, column: ParquetField | Options) {
   }
   if (!column.primitiveType!.includes('BYTE_ARRAY')) {
     value = decodeValues(
-      column.primitiveType!,
+      column.originalType === 'DECIMAL' && ['INT32', 'INT64'].includes(column.primitiveType!)
+        ? value.length === 4 ? 'INT32' : 'INT64'
+        : column.primitiveType!,
       'PLAIN',
       { buffer: Buffer.from(value), offset: 0 },
       1,
@@ -985,13 +987,10 @@ async function decodeDictionaryPage(cursor: Cursor, header: parquet_thrift.PageH
     };
   }
 
-  return decodeValues(
-    opts.column!.primitiveType!,
-    opts.column!.encoding!,
-    dictCursor,
-    header.dictionary_page_header!.num_values,
-    opts
-  );
+  return decodeValues(opts.type!, opts.column!.encoding!, dictCursor, header.dictionary_page_header!.num_values, {
+    ...opts,
+    ...opts.column,
+  });
 }
 
 async function decodeDataPage(cursor: Cursor, header: parquet_thrift.PageHeader, opts: Options) {
